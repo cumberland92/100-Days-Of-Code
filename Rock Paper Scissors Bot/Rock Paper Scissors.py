@@ -3,41 +3,28 @@ playerHistory = []
 cpuHistory = []
 playAgain = True
 howManyTimesHasCPUWon = 0
-totalGamesPlayed =0 
-def did_the_player_win_the_round(str1, str2):
+totalGamesPlayed =0
+RPSList = ["R", "P", "S"]
+def did_the_player_win_the_round(playerNum, cpuNum):
     cpuWins = False #bc the player lost
     playerWins = True #bc the player did win
-    if str1==str2:
+    if playerNum==cpuNum:
         return "Tie"
     else:
-        if str1=="R":
-            if str2 == "P":
-                return cpuWins
-            else: #str2==S
-                return playerWins
-
-        elif str1=="P":
-            if str2 == "S":
-                return cpuWins
-            else:
-                return playerWins
-
-        else: #str1 == "S"
-            if str2=="R":
-                return cpuWins
-            else:
-                return playerWins
+        if (playerNum - 1)%3 == cpuNum:
+            return playerWins
+        else:
+            return cpuWins 
 
 def get_cpu_move():
     #In the future this is where machine learning stuff will go
-    move = random.randint(0, 3)
-    if move==0:
-        return "R"
-    elif move==1:
-        return "P"
-    else:
-        return "S"
+    return random.randint(0, 2) 
 
+def move_to_number(str1):
+    if str1 in RPSList:
+        return RPSList.index(str1)
+    else: 
+        return -1
 
 print("Type \"R\" for rock, \"P\" for paper or \"S\" for scissors, followed by the enter key.\nOr if you want to quit, type \"Q\".")
 while(playAgain):
@@ -46,7 +33,11 @@ while(playAgain):
     if playerMove == "Q":
         print("Thanks for playing!")
         break
-    elif playerMove == "R" or playerMove == "P" or playerMove == "S":
+    else:
+        playerMove = move_to_number(playerMove)
+        if playerMove==-1: #they didn't type R, p, or s
+            print("Please type a valid response.")
+            continue
         totalGamesPlayed+=1
         cpuMove = get_cpu_move()
         cpuHistory.append(cpuMove)
@@ -67,7 +58,4 @@ while(playAgain):
                 cpuWinRate = round(float(howManyTimesHasCPUWon)/totalGamesPlayed*100, 2)
                 print("In fact, I've won {}% of the games we've played so far.\n".format(cpuWinRate))
 
-    else:
-        print("Please type a valid response.")
-        continue
-
+        
