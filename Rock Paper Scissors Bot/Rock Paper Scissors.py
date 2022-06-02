@@ -3,7 +3,7 @@ playerHistory = []
 cpuHistory = []
 playAgain = True
 howManyTimesHasCPUWon = 0
-totalGamesPlayed =0
+totalGamesPlayed = 0
 RPSList = ["R", "P", "S"]
 def did_the_player_win_the_round(playerNum, cpuNum):
     cpuWins = False #bc the player lost
