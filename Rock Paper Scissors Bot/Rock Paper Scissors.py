@@ -5,8 +5,43 @@ from tkinter import ttk
 """
 Initialize our global variables
 """
-playerHistory = []
-cpuHistory = []
+
+"""
+This tracks how many times each possible game has been played. There are nine possible outcomes,
+and we start out with each game set to 0. Once a game is played, we increase it's count by 1
+"""
+# gameHistory = {
+#     (0,0): 0,
+#     (0,1): 0,
+#     (0,2): 0,
+#     (1,0): 0,
+#     (1,1): 0,
+#     (1,2): 0,
+#     (2,0): 0,
+#     (2,1): 0,
+#     (2,2): 0
+# }
+
+
+"""
+Our prediction is a disct with 9 keys representing the 9 possible outcomes of player v computer
+the value of each key is itself a dict with 3 keys, representing players next move and the number of times we've seen it. 
+It starts out with every cell = 0 since the player hasn't made a move yet
+But this will update over time
+"""
+prediction = gameHistory = {
+    (0,0): {0: 0, 1: 0, 2: 0},
+    (0,1): {0: 0, 1: 0, 2: 0},
+    (0,2): {0: 0, 1: 0, 2: 0},
+    (1,0): {0: 0, 1: 0, 2: 0},
+    (1,1): {0: 0, 1: 0, 2: 0},
+    (1,2): {0: 0, 1: 0, 2: 0},
+    (2,0): {0: 0, 1: 0, 2: 0},
+    (2,1): {0: 0, 1: 0, 2: 0},
+    (2,2): {0: 0, 1: 0, 2: 0}
+}
+
+prevGame =""
 playAgain = True
 howManyTimesHasCPUWon = 0
 totalGamesPlayed = 0
@@ -33,9 +68,21 @@ def did_the_player_win_the_round(playerNum, cpuNum):
             return cpuWins
 
 def get_cpu_move():
-    #In the future this is where machine learning stuff will go
-    return random.randint(0, 2)
+    if prevGame=="": #if it's game 1
+        return random.randint(0,2)
+    
+    #we'll look at the dict stored in the prediction dict at the previous move key. 
+    possibleMoves = prediction[prevGame]
 
+    #From there we see what move the player made historically, and predict that the player will make the move (s)he's made most often in the past
+    values = possibleMoves.values()
+    maximum = max(values)
+    for key in possibleMoves.keys():
+        if possibleMoves[key] == maximum:
+            ourGuess = key
+
+    #and then we beat 'em
+    return (ourGuess+1)%3
 def move_to_number(str1):
     if str1 in RPSList:
         return RPSList.index(str1)
@@ -43,14 +90,17 @@ def move_to_number(str1):
         return -1
 
 def playTheGame(playerMove):
-    #playerMove = move_to_number(playerMove) We can just pass 0, 1, or 2 from the button
     global totalGamesPlayed
     totalGamesPlayed += 1
     cpuMove = get_cpu_move()
-    cpuHistory.append(cpuMove)
-    playerHistory.append(playerMove)
-    playerWonTheRound = did_the_player_win_the_round(playerHistory[-1], cpuHistory[-1])
-
+    global prevGame
+    if prevGame != "":
+        prediction[prevGame][playerMove] = prediction[prevGame][playerMove]+1 #we add one to the number of times player has responded with their choice of move based on the previous game
+    prevGame = (playerMove, cpuMove)
+    
+    
+    
+    playerWonTheRound = did_the_player_win_the_round(playerMove, cpuMove)
     if playerWonTheRound == "Tie":
         result = "We had a tie. Let's play again."
 
